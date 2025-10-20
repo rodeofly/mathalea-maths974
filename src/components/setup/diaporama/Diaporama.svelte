@@ -1,0 +1,334 @@
+<script lang="ts">
+  import seedrandom from 'seedrandom'
+  import { onDestroy, onMount } from 'svelte'
+  import { get } from 'svelte/store'
+  import { notify } from '../../../bugsnag'
+  import type Exercice from '../../../exercices/Exercice'
+  import {
+    getExercisesFromExercicesParams,
+    mathaleaFormatExercice,
+    mathaleaGenerateSeed,
+    mathaleaHandleExerciceSimple,
+    mathaleaHandleSup,
+    mathaleaUpdateExercicesParamsFromUrl,
+    mathaleaUpdateUrlFromExercicesParams,
+  } from '../../../lib/mathalea'
+  import { shuffle } from '../../../lib/outils/arrayOutils'
+  import {
+    darkMode,
+    exercicesParams,
+    globalOptions,
+    previousView,
+  } from '../../../lib/stores/generalStore'
+  import type { InterfaceParams } from '../../../lib/types'
+  import type { CanState } from '../../../lib/types/can'
+  import { isIntegerInRange0to3 } from '../../../lib/types/integerInRange'
+  import { context } from '../../../modules/context.js'
+  import CountDown from '../../display/can/presentationalComponents/CountDown.svelte'
+  import KickOff from '../../display/can/presentationalComponents/KickOff.svelte'
+  import ButtonText from '../../shared/forms/ButtonText.svelte'
+  import SlideshowOverview from './slideshowOverview/SlideshowOverview.svelte'
+  import SlideshowPlay from './slideshowPlay/SlideshowPlay.svelte'
+  import SlideshowSettings from './slideshowSettings/SlideshowSettings.svelte'
+  import type { Slide, Slideshow } from './types'
+
+  const transitionSounds = {
+    0: new Audio('assets/sounds/transition_sound_01.mp3'),
+    1: new Audio('assets/sounds/transition_sound_02.mp3'),
+    2: new Audio('assets/sounds/transition_sound_03.mp3'),
+    3: new Audio('assets/sounds/transition_sound_04.mp3'),
+  }
+
+  let state: CanState = 'end'
+  let exercises: Exercice[] = []
+  let slideshow: Slideshow = {
+    slides: [],
+    currentQuestion: -1,
+    selectedQuestionsNumber: 0,
+  }
+
+  $: if ($globalOptions.v === 'overview' && exercises.length > 0)
+    updateExercises(true)
+  $: if (state === 'race') startSlideshow()
+
+  onMount(async () => {
+    if ($previousView === undefined) state = 'start'
+    context.vue = 'diap'
+    document.addEventListener('updateAsyncEx', forceUpdate)
+    exercises = await getExercisesFromExercicesParams()
+    updateExercises(false, true)
+  })
+
+  onDestroy(() => {
+    document.removeEventListener('updateAsyncEx', forceUpdate)
+  })
+
+  async function forceUpdate() {
+    updateExercises(true)
+  }
+
+  async function updateExercises(
+    updateSlidesContent = false,
+    updateParamsFromUrl = false,
+  ) {
+    if (updateSlidesContent) setSlidesContent(exercises)
+    if ($globalOptions.v !== 'overview') adjustQuestionsOrder()
+    updateParamsFromUrl
+      ? mathaleaUpdateExercicesParamsFromUrl()
+      : updateExerciseParams(exercises)
+    mathaleaUpdateUrlFromExercicesParams($exercicesParams)
+  }
+
+  function setSlidesContent(newExercises: Exercice[]) {
+    const slides = []
+    const nbOfVues = $globalOptions.nbVues || 1
+    let selectedQuestionsNumber = 0
+    for (const [k, exercise] of [...newExercises].entries()) {
+      reroll(exercise)
+      const isSelected = $globalOptions.select?.includes(k) ?? true
+      if (isSelected) selectedQuestionsNumber += exercise.listeQuestions.length
+      for (let i = 0; i < exercise.listeQuestions.length; i++) {
+        const slide: Slide = {
+          exercise,
+          isSelected,
+          vues: [],
+        }
+        for (let idVue = 0; idVue < nbOfVues; idVue++) {
+          if (isIntegerInRange0to3(idVue)) {
+            reroll(exercise, idVue)
+          } else {
+            notify(`idVue ${idVue} is not an integer in range 0 to 3`, {})
+          }
+          const consigne = mathaleaFormatExercice(
+            exercise.consigne + exercise.introduction
+              ? '\n' + exercise.consigne + exercise.introduction
+              : '',
+          )
+          const question = mathaleaFormatExercice(exercise.listeQuestions[i])
+          const correction = mathaleaFormatExercice(
+            exercise.listeCorrections[i],
+          )
+          const { svgs: questionSvgs, text: questionText } =
+            splitSvgFromText(question)
+          const { svgs: consigneSvgs, text: consigneText } =
+            splitSvgFromText(consigne)
+          const { svgs: correctionSvgs, text: correctionText } =
+            splitSvgFromText(correction)
+          slide.vues.push({
+            consigne,
+            question,
+            correction,
+            consigneSvgs,
+            consigneText,
+            questionSvgs,
+            questionText,
+            correctionSvgs,
+            correctionText,
+          })
+        }
+        slides.push(slide)
+      }
+    }
+    slideshow = {
+      slides,
+      currentQuestion: -1,
+      selectedQuestionsNumber: selectedQuestionsNumber || slides.length,
+    }
+  }
+
+  function reroll(exercise: Exercice, idVue?: 0 | 1 | 2 | 3) {
+    if (exercise.seed === undefined) exercise.seed = mathaleaGenerateSeed()
+    const originalSeed = exercise.seed
+    if (idVue !== undefined && idVue > 0)
+      exercise.seed = exercise.seed + String(idVue)
+    if (exercise.typeExercice === 'simple') {
+      mathaleaHandleExerciceSimple(exercise, false)
+    } else {
+      seedrandom(exercise.seed, { global: true })
+      exercise.nouvelleVersionWrapper?.()
+    }
+    exercise.seed = originalSeed
+  }
+
+  function splitSvgFromText(sourceText: string) {
+    const parser = new DOMParser()
+    const doc = parser.parseFromString(sourceText, 'text/html')
+    const mathalea2dContainers = doc.querySelectorAll('div.svgContainer')
+    const scratchContainers = doc.querySelectorAll('pre.blocks')
+    const svgContainers = [...mathalea2dContainers, ...scratchContainers]
+    const svgs = Array.from(svgContainers).map(
+      (container) => container.outerHTML,
+    )
+    const text = removeSvgContainers(doc.body.innerHTML, svgs)
+    return {
+      svgs,
+      text,
+    }
+  }
+
+  function removeSvgContainers(wholeQuestion: string, svgContainers: string[]) {
+    let questionWithoutSvgContainers = wholeQuestion
+    svgContainers.forEach((svgContainer) => {
+      questionWithoutSvgContainers = questionWithoutSvgContainers.replace(
+        svgContainer,
+        '',
+      )
+    })
+    return questionWithoutSvgContainers
+  }
+
+  function adjustQuestionsOrder() {
+    const areSomeExercisesSelected =
+      $globalOptions.select && $globalOptions.select.length > 0
+    const selectedIndexes = areSomeExercisesSelected
+      ? getSelectedQuestionsIndexes()
+      : [...Array(slideshow.slides.length).keys()]
+    let order = undefined
+    if ($globalOptions.order && $globalOptions.order.length > 0) {
+      order = $globalOptions.order.slice(0, selectedIndexes.length)
+    }
+    if (
+      ($globalOptions.select && $globalOptions.select.length > 0) ||
+      ($globalOptions.order &&
+        $globalOptions.order.length < selectedIndexes.length)
+    ) {
+      order = selectedIndexes
+    }
+    if ($globalOptions.shuffle) {
+      if (
+        !$globalOptions.order ||
+        $globalOptions.order.length === 0 ||
+        isSameArray($globalOptions.order, selectedIndexes)
+      ) {
+        order = shuffle(selectedIndexes)
+      } else {
+        if ($globalOptions.order.length >= selectedIndexes.length) {
+          order = $globalOptions.order.slice(0, selectedIndexes.length)
+        } else {
+          order = shuffle(selectedIndexes)
+        }
+      }
+    }
+    $globalOptions.order = order
+  }
+
+  function isSameArray(a: number[], b: number[]) {
+    if (a.length !== b.length) return false
+    for (let i = 0; i < a.length; i++) {
+      if (a[i] !== b[i]) return false
+    }
+    return true
+  }
+
+  function getSelectedQuestionsIndexes() {
+    const indexes = []
+    for (const [i, slide] of [...slideshow.slides].entries()) {
+      if (slide.isSelected) {
+        indexes.push(i)
+      }
+    }
+    return indexes
+  }
+
+  function updateExerciseParams(newExercises: Exercice[]) {
+    if (newExercises.length === get(exercicesParams).length) {
+      // Update si nécessaire
+      exercicesParams.update((params: InterfaceParams[]) => {
+        params.forEach((param, i) => {
+          if (
+            param.alea &&
+            param.alea !== newExercises[i].seed?.substring(0, 4)
+          )
+            param.alea = newExercises[i].seed?.substring(0, 4)
+        })
+        return params
+      })
+    } else {
+      // MGU : on remet tout mais j'aime PAS , ancien code, ne devrait pas être utilisé
+      const newParams: InterfaceParams[] = []
+      for (const exercice of newExercises) {
+        newParams.push({
+          cd: exercice.correctionDetaillee ? '1' : '0',
+          uuid: exercice.uuid,
+          id: exercice.id,
+          alea: exercice.seed?.substring(0, 4),
+          nbQuestions: exercice.nbQuestions,
+          duration: exercice.duration,
+          sup: mathaleaHandleSup(exercice.sup),
+          sup2: mathaleaHandleSup(exercice.sup2),
+          sup3: mathaleaHandleSup(exercice.sup3),
+          sup4: mathaleaHandleSup(exercice.sup4),
+          sup5: mathaleaHandleSup(exercice.sup5),
+        })
+      }
+      exercicesParams.set(newParams)
+    }
+  }
+
+  function startSlideshow() {
+    updateExercises(true)
+    $globalOptions.v = 'diaporama'
+    slideshow.currentQuestion = 0
+  }
+
+  function backToSettings() {
+    $globalOptions.v = 'diaporama'
+    slideshow.currentQuestion = -1
+  }
+
+  function goToHome() {
+    $globalOptions.v = ''
+  }
+
+  function goToOverview() {
+    $globalOptions.v = 'overview'
+  }
+</script>
+
+<div id="diaporama" class="h-screen {$darkMode.isActive ? 'dark' : ''}">
+  {#if $globalOptions.v === 'overview' && slideshow.slides.length > 0}
+    <SlideshowOverview
+      {exercises}
+      {slideshow}
+      {updateExercises}
+      {backToSettings}
+    />
+  {:else}
+    {#if slideshow.currentQuestion === -1}
+      {#if state === 'start'}
+        <KickOff title="Diaporama" subTitle="" bind:state>
+          <ButtonText
+            class="mt-8 py-3 px-6 text-3xl rounded-xl font-bold border-2
+              border-coopmaths-struct-light dark:border-coopmathsdark-struct-light
+              text-coopmaths-canvas dark:text-coopmathsdark-canvas
+              bg-coopmaths-struct dark:bg-coopmathsdark-struct
+              hover:bg-coopmaths-struct-light dark:hover:bg-coopmathsdark-struct-lightest"
+            text="Paramètres"
+            on:click="{() => {
+              state = 'end'
+            }}"
+          />
+        </KickOff>
+      {:else if state === 'countdown'}
+        <CountDown bind:state />
+      {:else}
+        <SlideshowSettings
+          {exercises}
+          {updateExercises}
+          {transitionSounds}
+          {startSlideshow}
+          {goToOverview}
+          {goToHome}
+        />
+      {/if}
+    {/if}
+    {#if slideshow.currentQuestion > -1}
+      <SlideshowPlay
+        {slideshow}
+        {transitionSounds}
+        {backToSettings}
+        {goToOverview}
+      />
+    {/if}
+  {/if}
+</div>

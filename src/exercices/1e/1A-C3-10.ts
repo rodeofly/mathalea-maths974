@@ -1,0 +1,73 @@
+import { miseEnEvidence } from '../../lib/outils/embellissements'
+import { randint } from '../../modules/outils'
+import ExerciceQcmA from '../ExerciceQcmA'
+export const dateDePublication = '10/08/2025'
+export const uuid = '6eba7'
+// Author Stéphane Guyon
+export const refs = {
+  'fr-fr': ['1A-C3-10'],
+  'fr-ch': [],
+}
+export const interactifReady = true
+export const interactifType = 'qcm'
+export const amcReady = 'true'
+export const amcType = 'qcmMono'
+export const titre = 'Calculer avec des puissances (10)'
+export default class Puissances extends ExerciceQcmA {
+  versionOriginale: () => void = () => {
+    this.enonce =
+      'Soit $n$ un entier non nul.<br> À quelle expression est égale $\\dfrac{1}{\\left(-1\\right)^{n}}$ ?'
+    this.correction =
+      'Soit $n\\in \\mathbb{N}$.<br>$\\begin{aligned} \\left(-1\\right)^{n+2}&=\\left(-1\\right)^{2}\\times \\left(-1\\right)^{n} \\\\    &=1\\times \\left(-1\\right)^{n} \\\\    &= \\left(-1\\right)^{n}    \\end{aligned}$<br>'
+    this.correction +=
+      '$\\begin{aligned}\\text{or, }\\dfrac{1}{\\left(-1\\right)^{n}}&=\\dfrac{1^n}{\\left(-1\\right)^{n}}\\\\&=\\left(\\dfrac{1}{-1}\\right)^{n}\\\\&=\\left(-1\\right)^{n}\\\\\\end{aligned}.$<br>'
+    this.correction +=
+      'En conséquence, pour tout entier $n$, on a $\\left(-1\\right)^{n+2}=\\dfrac{1}{\\left(-1\\right)^{n}}$.'
+    this.reponses = [
+      '$\\left(-1\\right)^{n} $',
+      '$\\left(-1\\right)^{n+1}$ ',
+      '$-\\left(-1\\right)^{n} $',
+      '$\\left(-1\\right)^{n-1}$ ',
+    ]
+  }
+
+  versionAleatoire = () => {
+    const k = randint(3, 6)
+
+    this.enonce = `Soit $n$ un entier non nul.<br> À quelle expression est égale $\\dfrac{1}{\\left(-1\\right)^{n+${k}}}$  ?`
+    if (k === 2 || k === 4 || k === 6) {
+      this.correction = `Soit $n\\in \\mathbb{N}.$<br> $\\begin{aligned}\\left(-1\\right)^{n+${k}}&=\\left(-1\\right)^{n}\\times \\left(-1\\right)^${k}\\\\
+      &=\\left(-1\\right)^{n}
+    \\end{aligned}$<br>
+   $\\begin{aligned}\\text{or, }\\dfrac{1}{\\left(-1\\right)^{n}}&=\\dfrac{1^n}{\\left(-1\\right)^{n}}\\\\
+      &=\\left(\\dfrac{1}{-1}\\right)^{n}\\\\
+      &=\\left(-1\\right)^{n}.\\\\
+    \\end{aligned}$<br>
+    En conséquence, pour tout entier $n$, on a $\\left(-1\\right)^{n+${k}}=${miseEnEvidence('\\dfrac{1}{\\left(-1\\right)^{n}}')}$.
+    `
+      this.reponses = [
+        '$\\left(-1\\right)^{n} $',
+        '$\\left(-1\\right)^{n+1}$ ',
+        '$-\\left(-1\\right)^{n} $',
+        '$\\left(-1\\right)^{n-1}$ ',
+      ]
+    } else {
+      this.correction = `Soit $n\\in \\mathbb{N}.$<br>$\\begin{aligned}\\left(-1\\right)^{n+${k}}&=\\left(-1\\right)^${k}\\times \\left(-1\\right)^{n} \\\\
+      &=-\\left(-1\\right)^{n}
+    \\end{aligned}$<br>
+
+     En conséquence, pour tout entier $n$, on a $\\left(-1\\right)^{n+${k}}=-\\dfrac{1}{\\left(-1\\right)^{n}}=${miseEnEvidence('-\\left(-1\\right)^{n}')}.$`
+      this.reponses = [
+        '$-\\left(-1\\right)^{n}$ ',
+        '$\\left(-1\\right)^{n} $',
+        '$\\left(-1\\right)^{n+2} $',
+        '$-\\left(-1\\right)^{n+1} $',
+      ]
+    }
+  }
+
+  constructor() {
+    super()
+    this.versionAleatoire()
+  }
+}

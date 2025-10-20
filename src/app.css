@@ -1,0 +1,832 @@
+/* Write your global styles here, in PostCSS syntax */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Cache le menu toggle de MathLive */
+math-field::part(menu-toggle) {
+  display: none;
+}
+math-field::part(virtual-keyboard-toggle) {
+  display: none;
+}
+math-field:not(.fillInTheBlanks) {
+  font-size: '1em';
+  margin-left: 5px;
+  display: inline-block;
+  vertical-align: middle;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-radius: 4px;
+  border: 1px solid rgba(0, 0, 0, 0.3);
+  min-width: 80px;
+}
+math-field.fillInTheBlanks {
+  /* @apply bg-coopmaths-canvas dark:bg-coopmathsdark-canvas text-coopmaths-corpus dark:text-coopmathsdark-corpus; */
+  border: 'none';
+  box-shadow: 'none';
+  font-size: '1em';
+  margin-top: '1px';
+  padding: '2px';
+}
+
+math-field.schemaEnBoite {
+  margin: 0;
+  display: inline-block;
+  vertical-align: middle;
+  padding: 0px 0px;
+  border-radius: 4px;
+  border: 1px solid rgba(0, 0, 0, 0.3);
+  min-width: 50px;
+}
+
+@media print {
+  body {
+    font-size: 10pt !important;
+  }
+  nav,
+  aside,
+  footer,
+  .print-hidden {
+    display: none !important;
+  }
+
+  div {
+    margin-top: 0pt !important;
+    margin-bottom: 0pt !important;
+  }
+}
+
+@page {
+  size: A4;
+  margin: 30pt;
+}
+
+@layer components {
+  .checkbox-primary {
+    @apply appearance-none ml-2 h-4 w-4 border-2 border-gray-400 bg-gray-100 rounded-sm checked:bg-coopmaths-lightest checked:border-coopmaths focus:outline-none transition duration-500 cursor-pointer;
+  }
+}
+/* Retiré de ce fichier et positionné dans Start.svelte pour avoir accès à un ascenseur dans la page principale.
+ ::-webkit-scrollbar {
+  display:none;
+}
+:root{ scrollbar-width: none } */
+/*
+ .d8888b.                                                               
+d88P  Y88b                                                              
+888    888                                                              
+888        888  888 888d888 .d8888b   .d88b.  888  888 888d888 .d8888b  
+888        888  888 888P"   88K      d8P  Y8b 888  888 888P"   88K      
+888    888 888  888 888     "Y8888b. 88888888 888  888 888     "Y8888b. 
+Y88b  d88P Y88b 888 888          X88 Y8b.     Y88b 888 888          X88 
+ "Y8888P"   "Y88888 888      88888P'  "Y8888   "Y88888 888      88888P' 
+*/
+/* Définition des thèmes pour les curseurs */
+/* source : https://brennaobrien.com/blog/2014/05/style-input-type-range-in-every-browser.html */
+
+/* Firefox */
+input[type='range'] {
+  /* fix for FF unable to apply focus style bug  */
+  border: 1px solid white;
+
+  /*required for proper track sizing in FF*/
+  /* width: 300px; */
+}
+input[type='range']::-moz-range-track {
+  /* width: 300px; */
+  height: 10px;
+  background: #ddd;
+  border: none;
+}
+
+input[type='range']::-moz-range-thumb {
+  border: none;
+  border-radius: 0px;
+  height: 10px;
+  width: 16px;
+  background: #ff8c5c;
+}
+
+/*hide the outline behind the border*/
+input[type='range']:-moz-focusring {
+  outline: 1px solid white;
+  outline-offset: -1px;
+}
+
+input[type='range']:focus::-moz-range-track {
+  background: #ccc;
+}
+
+/*Chrome*/
+@media screen and (-webkit-min-device-pixel-ratio: 0) {
+  input[type='range'] {
+    -webkit-appearance: none;
+  }
+
+  /* piste */
+  input[type='range']::-webkit-slider-runnable-track {
+    /* width: 300px; */
+    height: 10px;
+    background: #ddd;
+    border: none;
+    /* border-radius: 3px; */
+  }
+
+  /*curseur lui-même */
+  input[type='range']::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    border: none;
+    height: 10px;
+    width: 16px;
+    /* border-radius: 50%; */
+    background: #ff8c5c;
+    /* margin-top: -4px; */
+  }
+
+  input[type='range']:focus {
+    outline: none;
+  }
+
+  input[type='range']:focus::-webkit-slider-runnable-track {
+    background: #ccc;
+  }
+}
+
+/* Internet Explorer */
+input[type='range']::-ms-track {
+  /* width: 300px; */
+  height: 10px;
+
+  /*remove bg colour from the track, we'll use ms-fill-lower and ms-fill-upper instead */
+  background: transparent;
+
+  /*leave room for the larger thumb to overflow with a transparent border */
+  border-color: transparent;
+  border-width: 6px 0;
+
+  /*remove default tick marks*/
+  color: transparent;
+}
+input[type='range']::-ms-fill-lower {
+  background: #777;
+  border-radius: 0px;
+}
+input[type='range']::-ms-fill-upper {
+  background: #ddd;
+  border-radius: 0px;
+}
+input[type='range']::-ms-thumb {
+  border: none;
+  height: 10px;
+  width: 16px;
+  border-radius: 0%;
+  background: #ff8c5c;
+}
+input[type='range']:focus::-ms-fill-lower {
+  background: #888;
+}
+input[type='range']:focus::-ms-fill-upper {
+  background: #ccc;
+}
+
+input[type='radio']:checked {
+  background-color: #f15929;
+}
+
+/*
+8888888888                   888                      
+888                          888                      
+888                          888                      
+8888888     .d88b.  88888b.  888888  .d88b.  .d8888b  
+888        d88""88b 888 "88b 888    d8P  Y8b 88K      
+888        888  888 888  888 888    88888888 "Y8888b. 
+888        Y88..88P 888  888 Y88b.  Y8b.          X88 
+888         "Y88P"  888  888  "Y888  "Y8888   88888P'
+*/
+
+/* source-sans-pro-200 - latin */
+@font-face {
+  font-family: 'Source Sans Pro';
+  font-style: normal;
+  font-weight: 200;
+  src:
+    local(''),
+    url('fonts/source-sans-pro-v21-latin-200.woff2') format('woff2'),
+    /* Chrome 26+, Opera 23+, Firefox 39+ */
+      url('fonts/source-sans-pro-v21-latin-200.woff') format('woff'); /* Chrome 6+, Firefox 3.6+, IE 9+, Safari 5.1+ */
+}
+/* source-sans-pro-200italic - latin */
+@font-face {
+  font-family: 'Source Sans Pro';
+  font-style: italic;
+  font-weight: 200;
+  src:
+    local(''),
+    url('fonts/source-sans-pro-v21-latin-200italic.woff2') format('woff2'),
+    /* Chrome 26+, Opera 23+, Firefox 39+ */
+      url('fonts/source-sans-pro-v21-latin-200italic.woff') format('woff'); /* Chrome 6+, Firefox 3.6+, IE 9+, Safari 5.1+ */
+}
+/* source-sans-pro-300 - latin */
+@font-face {
+  font-family: 'Source Sans Pro';
+  font-style: normal;
+  font-weight: 300;
+  src:
+    local(''),
+    url('fonts/source-sans-pro-v21-latin-300.woff2') format('woff2'),
+    /* Chrome 26+, Opera 23+, Firefox 39+ */
+      url('fonts/source-sans-pro-v21-latin-300.woff') format('woff'); /* Chrome 6+, Firefox 3.6+, IE 9+, Safari 5.1+ */
+}
+/* source-sans-pro-300italic - latin */
+@font-face {
+  font-family: 'Source Sans Pro';
+  font-style: italic;
+  font-weight: 300;
+  src:
+    local(''),
+    url('fonts/source-sans-pro-v21-latin-300italic.woff2') format('woff2'),
+    /* Chrome 26+, Opera 23+, Firefox 39+ */
+      url('fonts/source-sans-pro-v21-latin-300italic.woff') format('woff'); /* Chrome 6+, Firefox 3.6+, IE 9+, Safari 5.1+ */
+}
+/* source-sans-pro-regular - latin */
+@font-face {
+  font-family: 'Source Sans Pro';
+  font-style: normal;
+  font-weight: 400;
+  src:
+    local(''),
+    url('fonts/source-sans-pro-v21-latin-regular.woff2') format('woff2'),
+    /* Chrome 26+, Opera 23+, Firefox 39+ */
+      url('fonts/source-sans-pro-v21-latin-regular.woff') format('woff'); /* Chrome 6+, Firefox 3.6+, IE 9+, Safari 5.1+ */
+}
+/* source-sans-pro-italic - latin */
+@font-face {
+  font-family: 'Source Sans Pro';
+  font-style: italic;
+  font-weight: 400;
+  src:
+    local(''),
+    url('fonts/source-sans-pro-v21-latin-italic.woff2') format('woff2'),
+    /* Chrome 26+, Opera 23+, Firefox 39+ */
+      url('fonts/source-sans-pro-v21-latin-italic.woff') format('woff'); /* Chrome 6+, Firefox 3.6+, IE 9+, Safari 5.1+ */
+}
+/* source-sans-pro-600 - latin */
+@font-face {
+  font-family: 'Source Sans Pro';
+  font-style: normal;
+  font-weight: 600;
+  src:
+    local(''),
+    url('fonts/source-sans-pro-v21-latin-600.woff2') format('woff2'),
+    /* Chrome 26+, Opera 23+, Firefox 39+ */
+      url('fonts/source-sans-pro-v21-latin-600.woff') format('woff'); /* Chrome 6+, Firefox 3.6+, IE 9+, Safari 5.1+ */
+}
+/* source-sans-pro-600italic - latin */
+@font-face {
+  font-family: 'Source Sans Pro';
+  font-style: italic;
+  font-weight: 600;
+  src:
+    local(''),
+    url('fonts/source-sans-pro-v21-latin-600italic.woff2') format('woff2'),
+    /* Chrome 26+, Opera 23+, Firefox 39+ */
+      url('fonts/source-sans-pro-v21-latin-600italic.woff') format('woff'); /* Chrome 6+, Firefox 3.6+, IE 9+, Safari 5.1+ */
+}
+/* source-sans-pro-700 - latin */
+@font-face {
+  font-family: 'Source Sans Pro';
+  font-style: normal;
+  font-weight: 700;
+  src:
+    local(''),
+    url('fonts/source-sans-pro-v21-latin-700.woff2') format('woff2'),
+    /* Chrome 26+, Opera 23+, Firefox 39+ */
+      url('fonts/source-sans-pro-v21-latin-700.woff') format('woff'); /* Chrome 6+, Firefox 3.6+, IE 9+, Safari 5.1+ */
+}
+/* source-sans-pro-700italic - latin */
+@font-face {
+  font-family: 'Source Sans Pro';
+  font-style: italic;
+  font-weight: 700;
+  src:
+    local(''),
+    url('fonts/source-sans-pro-v21-latin-700italic.woff2') format('woff2'),
+    /* Chrome 26+, Opera 23+, Firefox 39+ */
+      url('fonts/source-sans-pro-v21-latin-700italic.woff') format('woff'); /* Chrome 6+, Firefox 3.6+, IE 9+, Safari 5.1+ */
+}
+/* source-sans-pro-900 - latin */
+@font-face {
+  font-family: 'Source Sans Pro';
+  font-style: normal;
+  font-weight: 900;
+  src:
+    local(''),
+    url('fonts/source-sans-pro-v21-latin-900.woff2') format('woff2'),
+    /* Chrome 26+, Opera 23+, Firefox 39+ */
+      url('fonts/source-sans-pro-v21-latin-900.woff') format('woff'); /* Chrome 6+, Firefox 3.6+, IE 9+, Safari 5.1+ */
+}
+/* source-sans-pro-900italic - latin */
+@font-face {
+  font-family: 'Source Sans Pro';
+  font-style: italic;
+  font-weight: 900;
+  src:
+    local(''),
+    url('fonts/source-sans-pro-v21-latin-900italic.woff2') format('woff2'),
+    /* Chrome 26+, Opera 23+, Firefox 39+ */
+      url('fonts/source-sans-pro-v21-latin-900italic.woff') format('woff'); /* Chrome 6+, Firefox 3.6+, IE 9+, Safari 5.1+ */
+}
+/* jelleebold - latin */
+@font-face {
+  font-family: 'jelleebold';
+  src:
+    local(''),
+    url('fonts/jellee-roman-webfont.woff2') format('woff2'),
+    url('fonts/jellee-roman-webfont.woff') format('woff');
+  font-weight: normal;
+  font-style: normal;
+}
+/* source-code-pro-200 - latin */
+@font-face {
+  font-family: 'Source Code Pro';
+  font-style: normal;
+  font-weight: 200;
+  src:
+    local(''),
+    url('fonts/source-code-pro-200.woff2') format('woff2'),
+    /* Chrome 26+, Opera 23+, Firefox 39+ */
+      url('fonts/source-code-pro-200.woff') format('woff'); /* Chrome 6+, Firefox 3.6+, IE 9+, Safari 5.1+ */
+}
+/* source-code-pro-200-italic - latin */
+@font-face {
+  font-family: 'Source Code Pro';
+  font-style: italic;
+  font-weight: 200;
+  src:
+    local(''),
+    url('fonts/source-code-pro-200-italic.woff2') format('woff2'),
+    /* Chrome 26+, Opera 23+, Firefox 39+ */
+      url('fonts/source-code-pro-200-italic.woff') format('woff'); /* Chrome 6+, Firefox 3.6+, IE 9+, Safari 5.1+ */
+}
+/* source-code-pro-300 - latin */
+@font-face {
+  font-family: 'Source Code Pro';
+  font-style: normal;
+  font-weight: 300;
+  src:
+    local(''),
+    url('fonts/source-code-pro-300.woff2') format('woff2'),
+    /* Chrome 26+, Opera 23+, Firefox 39+ */
+      url('fonts/source-code-pro-300.woff') format('woff'); /* Chrome 6+, Firefox 3.6+, IE 9+, Safari 5.1+ */
+}
+/* source-code-pro-300-italic - latin */
+@font-face {
+  font-family: 'Source Code Pro';
+  font-style: italic;
+  font-weight: 300;
+  src:
+    local(''),
+    url('fonts/source-code-pro-300-italic.woff2') format('woff2'),
+    /* Chrome 26+, Opera 23+, Firefox 39+ */
+      url('fonts/source-code-pro-300-italic.woff') format('woff'); /* Chrome 6+, Firefox 3.6+, IE 9+, Safari 5.1+ */
+}
+/* source-code-pro-400 - latin */
+@font-face {
+  font-family: 'Source Code Pro';
+  font-style: normal;
+  font-weight: 400;
+  src:
+    local(''),
+    url('fonts/source-code-pro-400.woff2') format('woff2'),
+    /* Chrome 26+, Opera 23+, Firefox 39+ */
+      url('fonts/source-code-pro-400.woff') format('woff'); /* Chrome 6+, Firefox 3.6+, IE 9+, Safari 5.1+ */
+}
+/* source-code-pro-400-italic - latin */
+@font-face {
+  font-family: 'Source Code Pro';
+  font-style: italic;
+  font-weight: 400;
+  src:
+    local(''),
+    url('fonts/source-code-pro-400-italic.woff2') format('woff2'),
+    /* Chrome 26+, Opera 23+, Firefox 39+ */
+      url('fonts/source-code-pro-400-italic.woff') format('woff'); /* Chrome 6+, Firefox 3.6+, IE 9+, Safari 5.1+ */
+}
+/* source-code-pro-500 - latin */
+@font-face {
+  font-family: 'Source Code Pro';
+  font-style: normal;
+  font-weight: 500;
+  src:
+    local(''),
+    url('fonts/source-code-pro-500.woff2') format('woff2'),
+    /* Chrome 26+, Opera 23+, Firefox 39+ */
+      url('fonts/source-code-pro-500.woff') format('woff'); /* Chrome 6+, Firefox 3.6+, IE 9+, Safari 5.1+ */
+}
+/* source-code-pro-500-italic - latin */
+@font-face {
+  font-family: 'Source Code Pro';
+  font-style: italic;
+  font-weight: 500;
+  src:
+    local(''),
+    url('fonts/source-code-pro-500-italic.woff2') format('woff2'),
+    /* Chrome 26+, Opera 23+, Firefox 39+ */
+      url('fonts/source-code-pro-500-italic.woff') format('woff'); /* Chrome 6+, Firefox 3.6+, IE 9+, Safari 5.1+ */
+}
+/* source-code-pro-600 - latin */
+@font-face {
+  font-family: 'Source Code Pro';
+  font-style: normal;
+  font-weight: 600;
+  src:
+    local(''),
+    url('fonts/source-code-pro-600.woff2') format('woff2'),
+    /* Chrome 26+, Opera 23+, Firefox 39+ */
+      url('fonts/source-code-pro-600.woff') format('woff'); /* Chrome 6+, Firefox 3.6+, IE 9+, Safari 5.1+ */
+}
+/* source-code-pro-600-italic - latin */
+@font-face {
+  font-family: 'Source Code Pro';
+  font-style: italic;
+  font-weight: 600;
+  src:
+    local(''),
+    url('fonts/source-code-pro-600-italic.woff2') format('woff2'),
+    /* Chrome 26+, Opera 23+, Firefox 39+ */
+      url('fonts/source-code-pro-600-italic.woff') format('woff'); /* Chrome 6+, Firefox 3.6+, IE 9+, Safari 5.1+ */
+}
+/* source-code-pro-700 - latin */
+@font-face {
+  font-family: 'Source Code Pro';
+  font-style: normal;
+  font-weight: 700;
+  src:
+    local(''),
+    url('fonts/source-code-pro-700.woff2') format('woff2'),
+    /* Chrome 26+, Opera 23+, Firefox 39+ */
+      url('fonts/source-code-pro-700.woff') format('woff'); /* Chrome 6+, Firefox 3.6+, IE 9+, Safari 5.1+ */
+}
+/* source-code-pro-700-italic - latin */
+@font-face {
+  font-family: 'Source Code Pro';
+  font-style: italic;
+  font-weight: 700;
+  src:
+    local(''),
+    url('fonts/source-code-pro-700-italic.woff2') format('woff2'),
+    /* Chrome 26+, Opera 23+, Firefox 39+ */
+      url('fonts/source-code-pro-700-italic.woff') format('woff'); /* Chrome 6+, Firefox 3.6+, IE 9+, Safari 5.1+ */
+}
+/* source-code-pro-900 - latin */
+@font-face {
+  font-family: 'Source Code Pro';
+  font-style: normal;
+  font-weight: 900;
+  src:
+    local(''),
+    url('fonts/source-code-pro-900.woff2') format('woff2'),
+    /* Chrome 26+, Opera 23+, Firefox 39+ */
+      url('fonts/source-code-pro-900.woff') format('woff'); /* Chrome 6+, Firefox 3.6+, IE 9+, Safari 5.1+ */
+}
+/* source-code-pro-900-italic - latin */
+@font-face {
+  font-family: 'Source Code Pro';
+  font-style: italic;
+  font-weight: 900;
+  src:
+    local(''),
+    url('fonts/source-code-pro-900-italic.woff2') format('woff2'),
+    /* Chrome 26+, Opera 23+, Firefox 39+ */
+      url('fonts/source-code-pro-900-italic.woff') format('woff'); /* Chrome 6+, Firefox 3.6+, IE 9+, Safari 5.1+ */
+}
+
+/* 
+888b     d888                                                                
+8888b   d8888                                                                
+88888b.d88888                                                                
+888Y88888P888  .d88b.  .d8888b  .d8888b   8888b.   .d88b.   .d88b.  .d8888b  
+888 Y888P 888 d8P  Y8b 88K      88K          "88b d88P"88b d8P  Y8b 88K      
+888  Y8P  888 88888888 "Y8888b. "Y8888b. .d888888 888  888 88888888 "Y8888b. 
+888   "   888 Y8b.          X88      X88 888  888 Y88b 888 Y8b.          X88 
+888       888  "Y8888   88888P'  88888P' "Y888888  "Y88888  "Y8888   88888P' 
+                                                       888                   
+                                                  Y8b d88P                   
+                                                   "Y88P"                     */
+/*warnMessage*/
+div[id^='warnMessage'] {
+  @apply bg-coopmaths-canvas dark:bg-coopmathsdark-canvas-dark px-4 py-2 my-2 border-l-4 border-l-coopmaths-warn-dark dark:border-l-coopmathsdark-warn-dark  font-light relative w-2/3;
+}
+div[id^='warnMessage']:before {
+  content: '🌬';
+  float: left;
+  @apply mr-3 text-lg text-coopmaths-canvas dark:text-coopmathsdark-canvas bg-coopmaths-warn-dark dark:bg-coopmathsdark-warn-dark rounded-full h-6 w-6 inline-flex items-center justify-center;
+}
+div[id^='title-warnMessage'] {
+  @apply font-bold pb-2 text-coopmaths-warn-dark dark:text-coopmathsdark-warn-dark;
+}
+/* info message */
+div[id^='infoMessage'] {
+  @apply bg-coopmaths-canvas dark:bg-coopmathsdark-canvas px-4 py-2 my-2 border-l-4 border-l-coopmaths-warn-dark dark:border-l-coopmathsdark-warn-dark  font-light relative w-2/3;
+}
+div[id^='infoMessage']:before {
+  content: 'ℹ';
+  float: left;
+  @apply mr-3 text-xl text-coopmaths-canvas dark:text-coopmathsdark-canvas font-black bg-coopmaths-warn-dark dark:bg-coopmathsdark-warn-dark rounded-full h-6 w-6 inline-flex items-center justify-center;
+}
+div[id^='title-infoMessage'] {
+  @apply font-bold pb-2 text-coopmaths-warn-dark dark:text-coopmathsdark-warn-dark;
+}
+/* lampe message */
+div[id^='lampeMessage'] {
+  @apply bg-coopmaths-canvas dark:bg-coopmathsdark-canvas px-4 py-2 my-2 border-l-4 border-l-coopmaths-warn-dark dark:border-l-coopmathsdark-warn-dark font-light relative w-2/3 mb-4;
+}
+div[id^='lampeMessage']:before {
+  content: '📚';
+  float: left;
+  @apply mr-3 text-xl text-coopmaths-warn-dark dark:text-coopmathsdark-warn-dark inline-block;
+}
+div[id^='title-lampeMessage'] {
+  @apply font-bold pb-2 text-coopmaths-warn-dark dark:text-coopmathsdark-warn-dark;
+}
+
+.katex {
+  font-size: 1em !important;
+}
+
+.mathalea2d {
+  @apply dark:bg-coopmathsdark-canvas-light;
+}
+
+input[id^='checkEx'] {
+  @apply cursor-pointer border-coopmaths-action text-coopmaths-action dark:border-coopmathsdark-action dark:text-coopmathsdark-action focus:ring-coopmaths-action dark:focus:ring-coopmathsdark-action h-4 w-4 rounded;
+}
+
+iframe[id^='iframe-video-'] {
+  @apply my-10;
+}
+
+button[id^='html-insert-button-'] {
+  @apply text-coopmaths-canvas dark:text-coopmathsdark-canvas bg-coopmaths-action dark:bg-coopmathsdark-action hover:bg-coopmaths-action-lightest dark:hover:bg-coopmathsdark-action-lightest px-2 py-1 rounded-sm mx-2;
+}
+
+input[id^='html-insert-text-input-'] {
+  @apply text-sm bg-coopmaths-canvas dark:bg-coopmathsdark-canvas text-coopmaths-corpus dark:text-coopmathsdark-corpus border border-coopmaths-action dark:border-coopmathsdark-action font-light focus:border focus:border-coopmaths-action dark:focus:border-coopmathsdark-action focus:outline-0 focus:ring-0 px-2 py-1 w-3/5 lg:w-2/5;
+}
+
+i[id^='html-insert-info-'] {
+  @apply flex px-2  hover:text-coopmaths-action-lightest text-coopmaths-action dark:text-coopmathsdark-action dark:hover:text-coopmathsdark-action-lightest;
+}
+
+span.code {
+  @apply font-mono bg-coopmaths-canvas-dark dark:bg-coopmathsdark-canvas-dark;
+}
+
+/* 
+888      d8b          888                      
+888      Y8P          888                      
+888                   888                      
+888      888 .d8888b  888888  .d88b.  .d8888b  
+888      888 88K      888    d8P  Y8b 88K      
+888      888 "Y8888b. 888    88888888 "Y8888b. 
+888      888      X88 Y88b.  Y8b.          X88 
+88888888 888  88888P'  "Y888  "Y8888   88888P' 
+ */
+
+ul.none {
+  @apply list-none list-outside;
+}
+ul.none > li {
+  margin-top: 0.5em;
+}
+ul.puces {
+  @apply list-["\1F784\00A0"] list-outside ml-4 marker:text-coopmaths-struct;
+}
+ul.puces > li {
+  margin-top: 0.5em;
+}
+ul.carres {
+  @apply list-["\25AA\00A0"] list-outside ml-4 marker:text-coopmaths-struct;
+}
+ul.carres > li {
+  margin-top: 0.5em;
+}
+ul.qcm {
+  @apply list-["\25A1\00A0"] list-outside ml-4 marker:text-coopmaths-struct;
+}
+ul.qcm > li {
+  margin-top: 0.5em;
+}
+ul.fleches {
+  @apply list-["\25B8\00A0"] list-outside ml-4 marker:text-coopmaths-struct;
+}
+ul.fleches > li {
+  margin-top: 0.5em;
+}
+ol.nombres {
+  @apply list-decimal list-outside ml-4 marker:text-coopmaths-struct;
+}
+ol.nombres > li {
+  margin-top: 0.5em;
+}
+ol.alpha {
+  @apply list-[lower-alpha] list-outside ml-4  marker:text-coopmaths-struct;
+  margin-left: 1.5rem;
+}
+ol.alpha > li {
+  margin-top: 0.5em;
+}
+ol.Alpha {
+  @apply list-[upper-alpha] list-outside ml-4  marker:text-coopmaths-struct;
+}
+ol.Alpha > li {
+  margin-top: 0.5em;
+}
+ol.roman {
+  @apply list-[lower-roman] list-outside ml-4  marker:text-coopmaths-struct;
+}
+ol.roman > li {
+  margin-top: 0.5em;
+}
+ol.Roman {
+  @apply list-[upper-roman] list-outside ml-4  marker:text-coopmaths-struct;
+}
+ol.Roman > li {
+  margin-top: 0.5em;
+}
+
+.numbered-list > div > li {
+  list-style: none; /* Retire les puces par défaut */
+  position: relative;
+}
+
+.numbered-list > div > li::before {
+  counter-increment: item;
+  display: inline-block; /* Aligne avec le texte */
+  margin-right: 0.5em; /* Espace entre le numéro et le texte */
+  font-weight: bold;
+  color: #216d9a;
+}
+
+.numbered-list > div > li::before {
+  content: counter(item) ') ';
+  margin-right: 0.5em;
+}
+
+.numbered-list {
+  counter-reset: item; /* Initialise le compteur */
+}
+
+@keyframes shake {
+  0% {
+    transform: translate(0, 0) rotate(0deg);
+  }
+  25% {
+    transform: translate(5px, 5px) rotate(5deg);
+  }
+  50% {
+    transform: translate(0, 0) rotate(0eg);
+  }
+  75% {
+    transform: translate(-5px, 5px) rotate(-5deg);
+  }
+  100% {
+    transform: translate(0, 0) rotate(0deg);
+  }
+}
+
+/*
+d888888b d8b   db d888888b d88888b d8888b.  .d8b.   .o88b. d888888b d888888b db    db d888888b d888888b db    db 
+  `88'   888o  88 `~~88~~' 88'     88  `8D d8' `8b d8P  Y8 `~~88~~'   `88'   88    88   `88'   `~~88~~' `8b  d8' 
+   88    88V8o 88    88    88ooooo 88oobY' 88ooo88 8P         88       88    Y8    8P    88       88     `8bd8'  
+   88    88 V8o88    88    88~~~~~ 88`8b   88~~~88 8b         88       88    `8b  d8'    88       88       88 
+  .88.   88  V888    88    88.     88 `88. 88   88 Y8b  d8    88      .88.    `8bd8'    .88.      88       88    
+Y888888P VP   V8P    YP    Y88888P 88   YD YP   YP  `Y88P'    YP    Y888888P    YP    Y888888P    YP       YP    
+*/
+
+table.tableauMathlive {
+  tbody {
+    tr {
+      td {
+        min-width: 50px;
+        math-field {
+          min-width: 60px;
+          margin-top: 2px;
+          padding: 2px;
+          border: transparent;
+        }
+        @apply border border-coopmaths-corpus dark:border-coopmathsdark-corpus p-2 text-center;
+      }
+    }
+    th {
+      @apply border border-coopmaths-corpus dark:border-coopmathsdark-corpus bg-coopmaths-struct dark:bg-coopmathsdark-struct bg-opacity-40 dark:bg-opacity-40 text-coopmaths-corpus dark:text-coopmathsdark-corpus p-2 text-center min-w-[75px] m-[3px];
+    }
+    @apply border border-coopmaths-corpus dark:border-coopmathsdark-corpus p-2 m-[3px] text-center;
+  }
+  @apply mx-auto mt-2 border-collapse text-center border-2 border-coopmaths-corpus dark:border-coopmathsdark-corpus;
+}
+
+div.rectangleDND {
+  min-width: 40px;
+  min-height: 40px;
+  border: 1px dashed #ccc;
+  border-radius: 10px;
+  display: flex;
+  justify-content: left;
+  align-items: center;
+  zoom: 1;
+  flex: 1;
+  flex-wrap: wrap;
+  padding: 6px 0px 6px 0px;
+}
+
+.rectangleDND.hovered {
+  border: 2px dashed green; /* Indique la zone de drop */
+  zoom: 1;
+}
+
+div.rectangles {
+  display: flex;
+  gap: 5px; /* Pour espacer du texte devant et derrière les différents divs */
+  min-width: 30px;
+  min-height: 30px;
+  align-items: center;
+  font-size: 18px;
+}
+
+div.etiquette {
+  position: relative;
+  flex: 0 1 auto;
+  box-sizing: content-box;
+  padding: 1px 3px 1px 3px;
+  margin: 0px 2px 0px 2px;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  min-height: 25px;
+  align-content: center;
+  font-size: 18px;
+  z-index: 3;
+}
+div.etiquette:active {
+  cursor: grabbing;
+}
+div.etiquette > span {
+  touch-action: none;
+}
+
+.dragOk {
+  cursor: grab;
+}
+.noDrag {
+  cursor: not-allowed;
+  background-color: '#FFFFFF';
+}
+
+div.etiquettes {
+  display: flex;
+  flex-wrap: wrap;
+  align-content: space-around;
+  align-items: center;
+  justify-items: flex-start;
+  gap: 5px;
+  width: 100%;
+  min-height: 60px;
+  margin-bottom: 5px;
+}
+
+.delete-btn {
+  position: absolute;
+  top: 0;
+  right: 0;
+  background-color: red;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  width: 10px;
+  height: 10px;
+  text-align: center;
+  font-size: 10px;
+}
+
+.oblique-strike {
+  position: relative;
+  display: inline-block;
+}
+
+.oblique-strike::after {
+  content: '';
+  position: absolute;
+  top: 50%; /* Positionnement vertical */
+  left: -15%;
+  width: 130%;
+  height: 2px; /* Épaisseur de la ligne */
+  background-color: black; /* Couleur de la ligne */
+  transform: rotate(-15deg); /* Angle de la ligne */
+}
+
+/* Fixes issue where Blockly toolbox scrollbar doesn't hide - https://github.com/google/blockly/issues/5840*/
+svg[display='none'] {
+  display: none;
+}
